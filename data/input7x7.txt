@@ -1,0 +1,334 @@
+7 5
+A != 2
+A + B = F
+C - D = G
+D + E = 2F
+E + G = F
+
+7 5
+G + C < 6
+C + D < 5
+D + G = E
+A + C = G
+B < F
+
+7 4
+A + E = C
+B + G = D
+C + E = D
+B + F = A
+
+7 5
+B + G = D
+B + C = A
+C + E + G = F
+D < A => C = 2
+D > A => E = 2
+
+7 5
+A + C = E
+C + E = B
+A + E = F
+G > C
+C > D
+
+7 4
+A + C + G = B + E
+B + E = F + 1
+A + E = D + 1
+D + 2G = F
+
+7 3
+C + D = A + E
+C + F = E
+B + D = C
+
+7 5
+2B + G = 2D - 1
+A + D = E + G
+F + 1 = EG
+C + D = A + B
+G = 1 => C != 2
+
+7 4
+E + G = F
+A + E = 6
+B + D = 8
+D + E = 9
+
+7 3
+B + C = A + D + G
+E + F = B + 2G
+E = A + F
+
+7 5
+F > D + 2
+A + B = G
+C + F = E
+B + C = F
+A + C = B
+
+7 5
+F + G = 6
+B + E = 7
+C + D = 8
+A + G = 9
+B + D + F = 10
+
+7 6
+A + B = C + E
+C + E = D + F
+D + F = G
+A + E = C + D
+C + D = F + G
+A != 6
+
+7 3
+A + C = F
+B + G = C
+A + E = B
+
+7 7
+E + F = B + C + G
+E + F = A + B + F
+E + F = D + F + G
+E + F = A + B + C + D
+A != 3
+G = 4 => E != 7
+D = 2 => F != 7
+
+7 9
+B + C = E + 2
+D + F = G + 3
+B + D = E + 3
+A + G = C + 4
+B != 1 => C > G
+C != 1 => A > C
+D != 1 => A < E
+E != 1 => A < B
+F != 1 => D < E
+
+7 4
+CF = 2E
+C + D = G
+B + E = 7
+E + 2 = F
+
+7 4
+D + G = B + C
+E + F = A + G
+F + 2 < E
+A + B < G
+
+7 5
+D + F = B
+B + D + 1 = G
+A + G = 2E
+B < C
+C < A
+
+7 4
+3F + 1 = 2C
+A + E = G + 1
+C + E = B + G
+B + D = C
+
+7 6
+B < E
+E < C
+D + F + 2 = C
+A + G = B
+F + 1 = G
+A != 2 => D != 4
+
+7 6
+A + B = C + D
+C + D = F + G
+C + E = D
+D + F = 7
+A + G = 10
+B != 5
+
+7 5
+C - G = E
+E + B = F + G
+F > D
+A > C
+D - G = A
+
+7 4
+2C = E - 1
+F + C = G
+E + F = C + B
+2G = D - 1
+
+7 4
+F + C = D
+E + B = C
+E + F = G
+D + F = 7
+
+7 4
+G > E
+C + D = F
+A + F = E
+D + F = B
+
+7 4
+2C = D - 5
+E - 1 = F
+G + C = B
+E + F = B + D
+
+7 4
+C + F = 10
+A + 3 = F
+G + B = D
+E + 1 = G
+
+7 5
+E + B = C + G
+B + G = D
+D + B = 8
+A + 2 = F
+G > E
+
+7 4
+B + C = 6
+ED = 2G
+E + C = G
+B + A + G = 14
+
+7 4
+A + 2 = F
+E + A = C
+2D = G - 4
+F < B
+
+7 4
+C - F = G
+C + E + D = 11
+D + A = B + 3
+C + F = E
+
+7 4
+C + E = 8
+2C = G + 9
+E + A = B
+2C = D + 10
+
+7 5
+A + B + 1 = F
+B + F + 1 = G
+D + 2 = C
+A + C = E
+A != 2
+
+7 4
+2G = C - 2
+C + 1 = F
+E + D = B
+D + A = E
+
+7 5
+C + G = B
+A > E
+C + 2 = G
+A < F
+G + E = D + 2
+
+7 3
+C - D = A - 1
+E + D = G
+GF = 2A
+
+7 4
+A + 1 = D
+B - F = G
+F + E = 8
+2D = F + 7
+
+7 5
+D - 3 = C
+F + B = 9
+E > C
+E + F = 6
+A - 3 = F
+
+7 4
+A + 1 = D
+A + B = F + 6
+BE = F + A
+C - A = D
+
+7 4
+4D = E + 17
+B < A
+E + G = F
+G + 1 = C
+
+7 4
+GC = G + A
+E - C = G
+A + C = F
+E + A + B = 12
+
+7 4
+E + F = A
+B + A = 9
+D + E = G
+B + D = 10
+
+7 4
+G + D = A + 8
+E + D = F + 6
+2G = B + 7
+2G = F + 11
+
+7 4
+B + E + F = 9
+3G = E + 7
+B + A = E
+4E = D + 13
+
+7 3
+C + 1 = A
+FE = D + G
+FD = E + D
+
+7 4
+E + 1 = F
+A + C = 13
+E + G = A
+B + E = D
+
+7 4
+G - 2 = B
+G + F = A
+D - B = E
+E + F = G
+
+7 5
+D + A = B + G
+B - E = F
+B < C
+F + D = G
+F + G = A + E
+
+7 4
+2E = B + 8
+D + C = G
+G + E = A + B
+C + F = 6
+
+7 4
+D - G = C
+E + B = D
+3G = B + 11
+D + B = C + A
+
+7 4
+G - F = D - 8
+E + F = D + C
+G + B = D
+A + F = E + G

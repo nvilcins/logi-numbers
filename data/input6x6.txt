@@ -1,0 +1,357 @@
+6 4
+A + B = D
+B + F = E
+C + D = E
+B != 1
+
+6 3
+BF = C
+B + D = F
+A != 5
+
+6 4
+C + B = D
+E + A = D
+A + C = E
+A + B = C
+
+6 3
+F = B + C
+E = 3A
+BF = A + D
+
+6 4
+3A = 2D
+3C = 2E
+3A = 4E
+B > F
+
+6 3
+D + A < E
+B + D < A
+C != 3
+
+6 6
+A > D
+B + F = C
+B + E = D
+A < D + 2
+E > F
+F > B
+
+6 4
+DE = 2B
+2C < E
+E < F
+D != 3
+
+6 4
+B = C + E
+A + F = 2D
+B + C = E + F
+D > B
+
+6 4
+D != 5 => F > E
+B > D => F = 3
+A + C - 1 = E
+E - A = D
+
+6 4
+D + 2 = E
+F + 1 = B
+B + 2 = C
+D + F < A
+
+6 4
+F = B + E
+D = A + E
+C = A + F
+B != 2
+
+6 6
+A + C = B + E
+A + B = C + D
+C + F = D + E
+A + D = C + E
+A + E = D + F
+D != 3
+
+6 3
+A + B = C + 1
+A + D = F + 2
+B + F = E + 3
+
+6 3
+EF = A
+C + 1 = E
+B < D
+
+6 4
+B + D = A
+A + D = C
+E + D = F
+D != 3 => F != 6
+
+6 6
+2A - D = B
+A = 5 => E < 3
+D > F => E = 3
+C + E > 4 => F > B
+D < E + 2 => B = 2
+A != 6 => C + D = B
+
+6 4
+AE = 2F
+3D = A + C
+DF = C + 1
+B > C
+
+6 2
+AC = 3F
+BC = 2E
+
+6 5
+2A - B = D
+2D - A = E
+2E - D = C
+F != 1
+A != 4
+
+6 4
+2B = C
+D + 1 = F
+F + 2 = E
+F != 4
+
+6 3
+A + C = D
+B + D = F
+C + 2 > D
+
+6 5
+A + E = C + 1
+A + F = E + 1
+B > D
+F != 3
+B != 5
+
+6 4
+A + E = B
+E + 2 = A
+E + F = D
+C < E
+
+6 4
+B + C = 5
+A + B = 6
+E + F = 7
+C + E = A
+
+6 5
+B + E = F
+F + D = C + 1
+D + E = C
+E != 3
+F != 5
+
+6 3
+A + B + 1 = C + F
+C + D + 1 = 2A
+D + F = A + E
+
+6 4
+B + E + A = 15
+D < C
+C + F = E
+D + F = A
+
+6 3
+A + B = D
+2B = C + 1
+D + 2 = E
+
+6 4
+2C = B + 6
+D + 1 = B
+B + 2 = F
+A + D = C
+
+6 3
+D - E = A
+2B = F + 7
+D + A = C
+
+6 3
+B - F = C
+AF = D + C
+D + E = 9
+
+6 3
+C + 1 = B
+E + A = D
+A + 2 = E
+
+6 4
+F - D = B - 4
+D + E = B + 5
+F + 1 = D
+A + 1 = C
+
+6 4
+D + C = 9
+F + B = E
+F + A = C
+E > C
+
+6 4
+B + A + F = 6
+F + A = C
+E < C
+2D = F + 9
+
+6 3
+F + B = A
+3D = B + 7
+C < F
+
+6 4
+A < F
+F < B
+2D = A + 10
+4A = C + 5
+
+6 4
+D + C = B
+D + A = 5
+D + F = 7
+A + C = 6
+
+6 3
+B - F = A
+D - E = C - 7
+E + A = F
+
+6 4
+F + E = C
+C + A = F + D
+E + B = C + D
+D + A = C
+
+6 4
+C > B
+E - B = F - 3
+A + C = D
+C + B = E + A
+
+6 4
+B + C = 5
+B + E = C
+A + B = F
+C + B = D
+
+6 5
+A > C
+A + F = D
+D != 6
+C + A = B
+C + E = A + F
+
+6 3
+A + C = 8
+F - 1 = D
+2A = E + 4
+
+6 4
+F + B = C
+E + F = B + D
+E + 3 = C
+A + 1 = C
+
+6 3
+4E = D + 19
+2A = D + 3
+B + A = C
+
+6 3
+3E = C + 7
+E + C = B + F
+F + D = A
+
+6 3
+B + A = E
+A + C = B + E
+C + E = D
+
+6 4
+C < B
+A != 5
+2D = B + 5
+F + D = E
+
+6 4
+A + D = B
+F + D = E
+3B = A + 7
+2E = A + 8
+
+6 3
+D + C = F
+A + 1 = B
+F + D = B
+
+6 3
+2F = A + 9
+3C = A
+D + C = B
+
+6 3
+2B = E + 9
+F - E = B - 8
+D + F = A
+
+6 3
+E + D + C = 8
+C + A = 5
+B + D = A + E
+
+6 4
+D + E = F + 1
+C + D = B + 3
+A + 2 = E
+D + A < B
+
+6 4
+E + A + B = 9
+2F = A
+A - D = E
+F + 1 = D
+
+6 4
+B + C = D
+F - B = E - 3
+B + C = F + E
+C + E = A
+
+6 4
+B - C = F - 2
+C + 1 = A
+B > F
+E + C = 6
+
+6 4
+B + E = F + 6
+F + E = B
+F + B = D
+F + A = E
+
+6 4
+2F = A + 5
+2A = E
+F + D = 9
+F + C = D + E
+
+6 3
+2A = F - 3
+E + C = A + B
+A + C = F

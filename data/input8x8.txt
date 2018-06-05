@@ -1,0 +1,188 @@
+8 5
+AD = 3F
+CE = F + G
+D + E = C
+B + G = H
+C + E = H
+
+8 6
+F + 1 = G
+H + 2 = C
+C + 3 = F
+H + 4 = A
+C + 5 = B
+D != 4
+
+8 9
+A + E = G
+C + D = 10
+E + F = 8
+A + C = 6
+F != 6 => H > F
+E != 1 => H > B
+G != 8 => F > B
+B != 5 => G != 5
+E != 3 => C != 4
+
+8 10
+B + E = 2C
+C + F = 2A
+A + B = 2H
+C + D = 2G
+D + F = 2H
+B + H = 2G
+A + H = 2C
+D + G = 2B
+A + E = 2F
+A != 6
+
+8 7
+A + B = 2C
+B + C = 2G
+G + H = 2B
+D + H = 2F
+D + E = 2B
+B + F = 2H
+A != 1
+
+8 6
+D + E = F
+B + C = D
+B + H = A
+C + G = F
+E + G = H
+B + E = G
+
+8 5
+2D = F
+2E = A
+AC = 10E
+G + H = E
+C + G = A
+
+8 6
+A + B = E + 1
+F + G = A + 1
+C + D = B + 2
+A + C = E + 2
+F + G = H - 2
+F > G <=> B > C
+
+8 4
+B + E = A
+F + G = C
+A + F = D
+E + H = B
+
+8 5
+CH = 12
+BC = 6
+3A - D = G
+CD - 10 = H
+E > F
+
+8 5
+A + H = B
+2G = C
+3D = H
+D + F = A + G
+C + E = 11
+
+8 5
+C + D = 6
+F + H = 9
+A + D = C
+C + F = G
+B < E
+
+8 6
+A + 3 = F
+F + 1 = C
+C + 2 = B
+G + H = 8
+E + F = 9
+G > H
+
+8 6
+A + B = D
+C + H = F + G
+B + D = E + H
+E + H = F
+E + G = C
+D + E = G
+
+8 6
+E + G + 1 = B
+F + H + 3 = D
+A + B - 8 = F
+E + F + 2 = C
+E + H = F
+B + D - 11 = A
+
+8 11
+A + 2 < D + 1
+A + 3 < E
+E < F
+B + 2 < G
+C + 1 < H
+H < B + 6
+D < E
+E < C + 3
+D < B + 3
+E + 1 < G
+F < D + 3
+
+8 5
+E + F = G
+A + D = B
+C + D = F
+F + C + 2 = H
+C + H = G + E
+
+8 5
+A + 1 = D
+G + 2 = F
+B + 2 = C
+C + 3 = A
+H + 5 = E
+
+8 5
+A + E + H = G
+A + E + B = C
+A + H + B = F
+H > E
+C > G
+
+8 5
+A + B = F + 4
+C + D = A + 2
+E + F = G + 4
+G + H = D + 7
+C + H = A + 4
+
+8 4
+2A = C
+2D = E
+B + H = F
+B + G = A
+
+8 5
+A + C = B
+E + 2 = D
+D + H = 9
+2F = D
+A + B = C + E
+
+8 5
+A + B = 2E
+C + H = 2F
+A + C = 3F
+C + E = 2D
+E + H = 3D
+
+8 5
+B + D = E
+E + G = A
+F + G = C
+C + D = H
+C != 4
