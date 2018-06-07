@@ -40,7 +40,7 @@ class BasicGenerator:
         self.weights = {
             "var_num": [5, 1],  # choice between variable and numerical value
             "val_exp": [3, 1],  # choice between value (variable/number) and expression
-            "eq_ineq": [3, 0],  # choice between equalities (= or !=) and inequalities (> or <)
+            "eq_ineq": [3, 1],  # choice between equalities (= or !=) and inequalities (> or <)
             "logic_eq": [1, 10],  # choice between logical expressions (if-then/iff) and equation/inequality
         } if custom_weights is None else custom_weights
 
@@ -81,7 +81,7 @@ class BasicGenerator:
             if choice(self.weights["eq_ineq"]) == 0:
                 op = sample(["=", "!="])
             else:
-                op = ">"
+                op = sample([">", ">="])
             return {
                 "op": op,
                 "lhs": rec_get_expression(),
