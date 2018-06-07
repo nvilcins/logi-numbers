@@ -28,7 +28,7 @@ def choice(weights):
 
 
 class BasicGenerator:
-    def __init__(self, n, seed=None, verbose=False):
+    def __init__(self, n, seed=None, verbose=False, custom_weights=None):
         self.n = n
         self.variables = string.ascii_uppercase[:self.n]
         self.values = None
@@ -41,7 +41,7 @@ class BasicGenerator:
             "var_num": [5, 1],  # choice between variable and numerical value
             "val_exp": [3, 1],  # choice between value (variable/number) and expression
             "logic_eq": [1, 10],  # choice between logical expressions (if-then/iff) and equation/inequality
-        }
+        } if custom_weights is None else custom_weights
 
     def get_random_rule(self):
         """
@@ -136,7 +136,7 @@ class BasicGenerator:
         _, possible_values = lbs.solve(max_steps=3)
         # then apply brute force to check all possible assignments (after logical reductions)
         bfs = BruteForceSolver(puzzle)
-        cnt = bfs.solve(possible_values=possible_values)
+        cnt, _ = bfs.solve(possible_values=possible_values)
         # return the number of solutions
         return cnt
 
