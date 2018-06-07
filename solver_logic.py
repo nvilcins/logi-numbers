@@ -70,15 +70,14 @@ def reduce_possible_values_by_rule(rule: Rule, possible_values):
     return updated, updated_possible_values
 
 
-def reduce_possible_values_by_subset_strategies(possible_values):
+def reduce_possible_values_by_naked_subset_strategy(possible_values):
     """
-    reduce possible value sets by "naked subset" / "disjoint subset" strategy
+    reduce possible value sets by "naked subset" strategy
     i.e., if we have exactly N variables VARS of the same possible value sets VALS of size N,
     we don't know which of variable from VARS has which value from VALS,
     but we know that VALS are distributed among VARS in some way,
     hence we know that all other variables (not in VARS) will definitely NOT have values from VALS,
     so we can remove all occurrences of values from VALS from value possibilities of all variables not in VARS.
-    :return: 
     """
     updated_possible_values = copy.deepcopy(possible_values)
     cont = True
@@ -103,6 +102,50 @@ def reduce_possible_values_by_subset_strategies(possible_values):
                 for var in vars_to_update:
                     cont = True
                     updated_possible_values[var] -= set(subset)
+            # break and repeat process if we had a successful update
+            if cont:
+                break
+    # result
+    updated = any(possible_values[var] != updated_possible_values[var] for var in possible_values.keys())
+    return updated, updated_possible_values
+
+
+def reduce_possible_values_by_hidden_subset_strategy(possible_values):
+    """
+    reduce possible value sets by "hidden subset" strategy
+    i.e., if we have a set of N values VALS such that these values occur in exactly N variables VARS as possible values
+    we know for sure that values from VALS are distributed among VARS in some way,
+    hence we know that all other values from current possible value sets for variables in VARS
+    will definitely NOT be assigned to them (variables in VARS),
+    so we can remove all occurrences of values not from VALS from all variables in VARS.
+    """
+    updated_possible_values = copy.deepcopy(possible_values)
+    cont = True
+    # repeat until not updated
+    while cont:
+        cont = False
+        # {value -> all variables that contain value in possible value set}
+        val_to_vars = defaultdict(list)
+        for var, vals in updated_possible_values.items():
+            for val in vals:
+                val_to_vars[val].append(var)
+        # {variable set -> all values that are contained in exactly the variable set}
+        var_subset_to_vals = defaultdict(list)
+        for val, vars in val_to_vars.items():
+            var_subset_to_vals[tuple(sorted(vars))].append(val)
+        # try the strategy to the variable subsets
+        for vars, vals in var_subset_to_vals.items():
+            # if the subset of N variables matches exactly N values, try reduction
+            if len(vars) == len(vals):
+                # we update all the variables from `vars` that have more than just `vals` as possible value sets
+                vars_to_update = [
+                    var for var in vars
+                    if set(updated_possible_values[var]) - set(vals)
+                ]
+                # set their possible values sets to `vals` (i.e., remove everything else)
+                for var in vars_to_update:
+                    cont = True
+                    updated_possible_values[var] = set(vals)
             # break and repeat process if we had a successful update
             if cont:
                 break
@@ -219,19 +262,30 @@ def apply_variable_expression(rule: Rule, var_expression: Rule):
 class LogicBasedSolver:
     def __init__(self, puzzle: Puzzle, verbose=False):
         self.puzzle = puzzle
+        self.verbose = verbose
         self.possible_values = {
             variable: set(range(1, self.puzzle.n+1))
             for variable in self.puzzle.variables
         }
-        self.rules = puzzle.rules
+        self.rules = []
+        self.rule_hashes = set()
+        for rule in self.puzzle.rules:
+            self.add_new_rule(rule)
         self.variable_expressions = {
             variable: set()
             for variable in self.puzzle.variables
         }
-        self.verbose = verbose
+
+    def add_new_rule(self, rule: Rule):
+        """
+        add new rule if it is not already present
+        """
+        h = rule.__hash__()
+        if h not in self.rule_hashes:
+            self.rules.append(rule)
+            self.rule_hashes.add(h)
 
     def solve(self):
-        c = 0
         while True:
             self.reduce_possible_values()
             if all(len(vals) == 1 for vals in self.possible_values.values()):
@@ -240,7 +294,9 @@ class LogicBasedSolver:
                 break
             self.try_expressing_variables()
             self.try_applying_variable_expressions()
-            c += 1
+            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            # print(self.possible_values)
+            # print(len(self.rules), len(self.variable_expressions))
 
     def reduce_possible_values(self):
         """
@@ -259,11 +315,18 @@ class LogicBasedSolver:
                     self.possible_values = updated_possible_values
                     cont = True
                     break
-            # try reducing by subset strategies
-            updated, updated_possible_values = reduce_possible_values_by_subset_strategies(self.possible_values)
+            # try reducing by naked subset strategy
+            updated, updated_possible_values = reduce_possible_values_by_naked_subset_strategy(self.possible_values)
             if updated:
                 if self.verbose:
-                    print("reduced by subset strategies:", self.possible_values, "==>", updated_possible_values)
+                    print("reduced by naked subset strategy:", self.possible_values, "==>", updated_possible_values)
+                self.possible_values = updated_possible_values
+                cont = True
+            # try reducing by hidden subset strategy
+            updated, updated_possible_values = reduce_possible_values_by_hidden_subset_strategy(self.possible_values)
+            if updated:
+                if self.verbose:
+                    print("reduced by hidden subset strategy:", self.possible_values, "==>", updated_possible_values)
                 self.possible_values = updated_possible_values
                 cont = True
 
@@ -300,27 +363,20 @@ class LogicBasedSolver:
 
 
 if __name__ == "__main__":
-    # puzzle = Puzzle(5)
-    # puzzle.add_rules([
-    #     "B+A=6",
-    #     "E+B=C",
-    #     "E+C+B=8",
-    # ])
     # puzzle = Puzzle(7)
     # puzzle.add_rules([
-    #     "A!=2",
-    #     "A+B=F",
-    #     "C-D=G",
-    #     "D+E=2F",
-    #     "E+G=F",
+    #     "B+G=D",
+    #     "B+C=A",
+    #     "C+E+G=F",
+    #     "D<A=>C=2",
+    #     "D>A=>E=2",
     # ])
-    puzzle = Puzzle(7)
+    puzzle = Puzzle(6)
     puzzle.add_rules([
-        "B+G=D",
-        "B+C=A",
-        "C+E+G=F",
-        "D<A=>C=2",
-        "D>A=>E=2",
+        "D + 2 = E",
+        "F + 1 = B",
+        "B + 2 = C",
+        "D + F < A"
     ])
-    lbs = LogicBasedSolver(puzzle)
+    lbs = LogicBasedSolver(puzzle, verbose=True)
     lbs.solve()
