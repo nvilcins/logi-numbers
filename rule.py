@@ -50,6 +50,8 @@ class Rule:
                     return expression["value"]
                 return values[expression["value"]]
             lhs, rhs = get_val_rec(expression["lhs"]), get_val_rec(expression["rhs"])
+            if lhs is None or rhs is None:
+                return None
             if expression["op"] == "+":
                 return lhs + rhs
             if expression["op"] == "-":

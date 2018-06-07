@@ -293,10 +293,10 @@ class LogicBasedSolver:
             if all(len(vals) == 1 for vals in self.possible_values.values()):
                 print("we are done")
                 print(self.possible_values)
-                break
+                return True
             if max_steps is not None and steps == max_steps:
                 print("fail")
-                break
+                return False
             self.try_expressing_variables()
             self.try_applying_variable_expressions()
             # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
@@ -316,7 +316,7 @@ class LogicBasedSolver:
                 updated, updated_possible_values = reduce_possible_values_by_rule(rule, self.possible_values)
                 if updated:
                     if self.verbose:
-                        print("reduced by rule:", rule, self.possible_values, "==>", updated_possible_values)
+                        print("reduced by rule:", rule, ",", self.possible_values, "==>", updated_possible_values)
                     self.possible_values = updated_possible_values
                     cont = True
                     break
@@ -348,7 +348,7 @@ class LogicBasedSolver:
                 new_expression = express_variable_from_rule(rule, var)
                 if new_expression is not None:
                     if self.verbose:
-                        print("new variable expression:", rule, var, "==>", new_expression)
+                        print("new variable expression:", rule, ",", var, "==>", new_expression)
                     self.variable_expressions[var].add(new_expression)
 
     def try_applying_variable_expressions(self):
@@ -362,7 +362,7 @@ class LogicBasedSolver:
                 for var_expression in self.variable_expressions[var]:
                     new_rule = apply_variable_expression(rule, var_expression)
                     if self.verbose:
-                        print("new rule:", rule, var_expression, "==>", new_rule)
+                        print("new rule:", rule, ",", var_expression, "==>", new_rule)
                     new_rules.append(new_rule)
         for new_rule in new_rules:
             self.add_new_rule(new_rule)
@@ -377,12 +377,18 @@ if __name__ == "__main__":
     #     "D<A=>C=2",
     #     "D>A=>E=2",
     # ])
+    # puzzle = Puzzle(6)
+    # puzzle.add_rules([
+    #     "D + 2 = E",
+    #     "F + 1 = B",
+    #     "B + 2 = C",
+    #     "D + F < A"
+    # ])
     puzzle = Puzzle(6)
     puzzle.add_rules([
-        "D + 2 = E",
-        "F + 1 = B",
-        "B + 2 = C",
-        "D + F < A"
+        "D - E = A",
+        "2B = F + 7",
+        "D + A = C",
     ])
     lbs = LogicBasedSolver(puzzle, verbose=True)
-    lbs.solve(5)
+    lbs.solve(4)
