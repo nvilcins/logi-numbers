@@ -7,14 +7,17 @@ from solver_brute import BruteForceSolver
 from solver_logic import LogicBasedSolver
 
 
+# uniformly random number from interval
 def ri(a, b):
     return random.randint(a, b)
 
 
+# uniformly random element from array a
 def sample(a):
     return a[ri(0, len(a)-1)]
 
 
+# random array index according to (integer) weights
 def choice(weights):
     x = ri(1, sum(weights))
     s = 0
@@ -124,17 +127,29 @@ class BasicGenerator:
             "rhs": rhs,
         })
 
+    def get_solution_count(self, puzzle):
+        """
+        get the number of solutions to given (partial) puzzle
+        """
+        # first do 3 steps of logical solver, to (hopefully) greatly reduce search space
+        lbs = LogicBasedSolver(puzzle)
+        _, possible_values = lbs.solve(max_steps=3)
+        # then apply brute force to check all possible assignments (after logical reductions)
+        bfs = BruteForceSolver(puzzle)
+        cnt = bfs.solve(possible_values=possible_values)
+        # return the number of solutions
+        return cnt
+
     def reduce_until_unique(self, puzzle):
         """
         generate and add new random rules until we have a unique solution
         """
-        bfs = BruteForceSolver(puzzle)
-        cnt = bfs.solve()
+        cnt = self.get_solution_count(puzzle)
         while True:
             # add new random rule
             puzzle.rules.append(self.get_random_rule())
             # get the new number of solutions
-            cnt_new = bfs.solve()
+            cnt_new = self.get_solution_count(puzzle)
             # unique solution - we are done
             if cnt_new == 1:
                 break
@@ -150,7 +165,6 @@ class BasicGenerator:
         drop redundant rules one by one
         (those that don't reduce solution count within the context of the other rules)
         """
-        bfs = BruteForceSolver(puzzle)
         updated = True
         while updated:
             updated = False
@@ -161,7 +175,8 @@ class BasicGenerator:
                 # drop the rule
                 puzzle.rules = puzzle.rules[:i] + puzzle.rules[i+1:]
                 # still unique solution - dropped rules was redundant
-                if bfs.solve() == 1:
+                cnt = self.get_solution_count(puzzle)
+                if cnt == 1:
                     updated = True
                     break
             # no rule was redundant - apply the backup
@@ -182,7 +197,8 @@ class BasicGenerator:
                 print(puzzle)
             # check if it is solvable by logic
             lbs = LogicBasedSolver(puzzle)
-            if lbs.solve(4):
+            ok, _ = lbs.solve(4)
+            if ok:
                 if self.verbose:
                     print("puzzle successful")
                 return puzzle
@@ -190,7 +206,7 @@ class BasicGenerator:
                 print("puzzle unsuccessful")
 
 if __name__ == "__main__":
-    bg = BasicGenerator(7, seed=2019, verbose=True)
+    bg = BasicGenerator(8, seed=2019, verbose=True)
     puzzle = bg.generate()
     print(puzzle)
     # bg = BasicGenerator(7, seed=2019, verbose=True)

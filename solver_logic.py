@@ -291,17 +291,16 @@ class LogicBasedSolver:
             steps += 1
             self.reduce_possible_values()
             if all(len(vals) == 1 for vals in self.possible_values.values()):
-                print("we are done")
-                print(self.possible_values)
-                return True
+                if self.verbose:
+                    print("we are done")
+                    print(self.possible_values)
+                return True, self.possible_values
             if max_steps is not None and steps == max_steps:
-                print("fail")
-                return False
+                if self.verbose:
+                    print("fail")
+                return False, self.possible_values
             self.try_expressing_variables()
             self.try_applying_variable_expressions()
-            # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-            # print(self.possible_values)
-            # print(len(self.rules), len(self.variable_expressions))
 
     def reduce_possible_values(self):
         """
@@ -369,14 +368,14 @@ class LogicBasedSolver:
 
 
 if __name__ == "__main__":
-    # puzzle = Puzzle(7)
-    # puzzle.add_rules([
-    #     "B+G=D",
-    #     "B+C=A",
-    #     "C+E+G=F",
-    #     "D<A=>C=2",
-    #     "D>A=>E=2",
-    # ])
+    puzzle = Puzzle(7)
+    puzzle.add_rules([
+        "B+G=D",
+        "B+C=A",
+        "C+E+G=F",
+        "D<A=>C=2",
+        "D>A=>E=2",
+    ])
     # puzzle = Puzzle(6)
     # puzzle.add_rules([
     #     "D + 2 = E",
@@ -384,11 +383,11 @@ if __name__ == "__main__":
     #     "B + 2 = C",
     #     "D + F < A"
     # ])
-    puzzle = Puzzle(6)
-    puzzle.add_rules([
-        "D - E = A",
-        "2B = F + 7",
-        "D + A = C",
-    ])
+    # puzzle = Puzzle(6)
+    # puzzle.add_rules([
+    #     "D - E = A",
+    #     "2B = F + 7",
+    #     "D + A = C",
+    # ])
     lbs = LogicBasedSolver(puzzle, verbose=True)
     lbs.solve(4)
