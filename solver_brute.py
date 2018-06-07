@@ -10,8 +10,9 @@ class BruteForceSolver:
         """
         check all possible value assignments
         count the number of assignments that satisfy the puzzle
+        also return one of the solutions
         """
-        cnt = 0
+        cnt, last_solution = 0, None
         for permutation in permutations(list(range(1, self.puzzle.n+1))):
             values = dict(zip(self.puzzle.variables, permutation))
             for rule in self.puzzle.rules:
@@ -20,13 +21,15 @@ class BruteForceSolver:
                     break
             else:
                 cnt += 1
-        return cnt
+                last_solution = values
+        return cnt, last_solution
 
     def solve(self, possible_values=None):
         """
         check all possible value assignments
         reduce search space if `possible_values` is given
         count the number of assignments that satisfy the puzzle
+        also return one of the solutions
         """
         # `possible_values` not given, do full search
         if possible_values is None:
@@ -51,7 +54,7 @@ class BruteForceSolver:
         rec_get_assignments(0, assignment, used_vals, assignments)
 
         # count how many of the assignments satisfy the puzzle
-        cnt = 0
+        cnt, last_solution = 0, None
         for values in assignments:
             for rule in self.puzzle.rules:
                 ok = rule.eval_rule(values)
@@ -59,7 +62,8 @@ class BruteForceSolver:
                     break
             else:
                 cnt += 1
-        return cnt
+                last_solution = values
+        return cnt, last_solution
 
 
 if __name__ == "__main__":
@@ -70,8 +74,8 @@ if __name__ == "__main__":
         "E+C+B=8",
     ])
     bfs = BruteForceSolver(puzzle)
-    cnt = bfs.solve()
-    cnt = bfs.solve(possible_values={
+    cnt, _ = bfs.solve()
+    cnt, _ = bfs.solve(possible_values={
         "A": {1, 2, 3, 4, 5},
         "B": {1, 2, 3},
         "C": {3, 4, 5},
