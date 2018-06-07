@@ -285,12 +285,17 @@ class LogicBasedSolver:
             self.rules.append(rule)
             self.rule_hashes.add(h)
 
-    def solve(self):
+    def solve(self, max_steps=None):
+        steps = 0
         while True:
+            steps += 1
             self.reduce_possible_values()
             if all(len(vals) == 1 for vals in self.possible_values.values()):
                 print("we are done")
                 print(self.possible_values)
+                break
+            if max_steps is not None and steps == max_steps:
+                print("fail")
                 break
             self.try_expressing_variables()
             self.try_applying_variable_expressions()
@@ -359,7 +364,8 @@ class LogicBasedSolver:
                     if self.verbose:
                         print("new rule:", rule, var_expression, "==>", new_rule)
                     new_rules.append(new_rule)
-        self.rules.extend(new_rules)
+        for new_rule in new_rules:
+            self.add_new_rule(new_rule)
 
 
 if __name__ == "__main__":
@@ -379,4 +385,4 @@ if __name__ == "__main__":
         "D + F < A"
     ])
     lbs = LogicBasedSolver(puzzle, verbose=True)
-    lbs.solve()
+    lbs.solve(5)
