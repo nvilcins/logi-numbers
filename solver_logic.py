@@ -217,7 +217,7 @@ def apply_variable_expression(rule: Rule, var_expression: Rule):
 
 
 class LogicBasedSolver:
-    def __init__(self, puzzle: Puzzle):
+    def __init__(self, puzzle: Puzzle, verbose=False):
         self.puzzle = puzzle
         self.possible_values = {
             variable: set(range(1, self.puzzle.n+1))
@@ -228,6 +228,7 @@ class LogicBasedSolver:
             variable: set()
             for variable in self.puzzle.variables
         }
+        self.verbose = verbose
 
     def solve(self):
         c = 0
@@ -253,14 +254,16 @@ class LogicBasedSolver:
             for rule in self.rules:
                 updated, updated_possible_values = reduce_possible_values_by_rule(rule, self.possible_values)
                 if updated:
-                    print("reduced by rule:", rule, self.possible_values, "==>", updated_possible_values)
+                    if self.verbose:
+                        print("reduced by rule:", rule, self.possible_values, "==>", updated_possible_values)
                     self.possible_values = updated_possible_values
                     cont = True
                     break
             # try reducing by subset strategies
             updated, updated_possible_values = reduce_possible_values_by_subset_strategies(self.possible_values)
             if updated:
-                print("reduced by subset strategies:", self.possible_values, "==>", updated_possible_values)
+                if self.verbose:
+                    print("reduced by subset strategies:", self.possible_values, "==>", updated_possible_values)
                 self.possible_values = updated_possible_values
                 cont = True
 
@@ -276,7 +279,8 @@ class LogicBasedSolver:
                     continue
                 new_expression = express_variable_from_rule(rule, var)
                 if new_expression is not None:
-                    print("new variable expression:", rule, var, "==>", new_expression)
+                    if self.verbose:
+                        print("new variable expression:", rule, var, "==>", new_expression)
                     self.variable_expressions[var].add(new_expression)
 
     def try_applying_variable_expressions(self):
@@ -289,7 +293,8 @@ class LogicBasedSolver:
             for var in rule.variables:
                 for var_expression in self.variable_expressions[var]:
                     new_rule = apply_variable_expression(rule, var_expression)
-                    print("new rule:", rule, var_expression, "==>", new_rule)
+                    if self.verbose:
+                        print("new rule:", rule, var_expression, "==>", new_rule)
                     new_rules.append(new_rule)
         self.rules.extend(new_rules)
 
@@ -301,12 +306,21 @@ if __name__ == "__main__":
     #     "E+B=C",
     #     "E+C+B=8",
     # ])
+    # puzzle = Puzzle(7)
+    # puzzle.add_rules([
+    #     "A!=2",
+    #     "A+B=F",
+    #     "C-D=G",
+    #     "D+E=2F",
+    #     "E+G=F",
+    # ])
     puzzle = Puzzle(7)
     puzzle.add_rules([
-        "A+E=C",
         "B+G=D",
-        "C+E=D",
-        "B+F=A",
+        "B+C=A",
+        "C+E+G=F",
+        "D<A=>C=2",
+        "D>A=>E=2",
     ])
     lbs = LogicBasedSolver(puzzle)
     lbs.solve()
