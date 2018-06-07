@@ -8,6 +8,12 @@ class Puzzle:
         self.variables = string.ascii_uppercase[:n]
         self.rules = []
 
+    def __str__(self):
+        return "<Puzzle: {n} [\n  {rules}\n]>".format(
+            n=self.n,
+            rules=",\n  ".join(rule.__str__() for rule in self.rules)
+        )
+
     def add_rule(self, rule_str):
         self.rules.append(Rule(rule_raw=rule_str))
 

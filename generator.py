@@ -1,18 +1,20 @@
 import random
 import string
 
-from helpers import structured_to_raw_rule
 from puzzle import Puzzle
+from rule import Rule
 from solver_brute import BruteForceSolver
+from solver_logic import LogicBasedSolver
 
 
 class BasicGenerator:
-    def __init__(self, n, seed=None):
+    def __init__(self, n, seed=None, verbose=False):
         self.n = n
         self.variables = string.ascii_uppercase[:self.n]
         self.values = None
         if seed is not None:
             random.seed(seed)
+        self.verbose = verbose
 
     def get_random_rule(self):
         """
@@ -39,11 +41,11 @@ class BasicGenerator:
         if op0 == "<":
             op0 = ">"
             lhs, rhs = rhs, lhs
-        return {
+        return Rule(rule_structured={
             "op": op0,
             "lhs": lhs,
             "rhs": rhs,
-        }
+        })
 
     def reduce_until_unique(self, puzzle):
         """
@@ -90,13 +92,27 @@ class BasicGenerator:
                 puzzle.rules = rules_prev
 
     def generate(self):
-        puzzle = Puzzle(self.n)
-        self.reduce_until_unique(puzzle)
-        self.drop_redundant_rules(puzzle)
-        return puzzle.rules
+        # try generating forever, until successful
+        while True:
+            if self.verbose:
+                print("generating puzzle..")
+            # generate puzzle
+            puzzle = Puzzle(self.n)
+            self.reduce_until_unique(puzzle)
+            self.drop_redundant_rules(puzzle)
+            if self.verbose:
+                print("puzzle generated")
+                print(puzzle)
+            # check if it is solvable by logic
+            lbs = LogicBasedSolver(puzzle)
+            if lbs.solve(4):
+                if self.verbose:
+                    print("puzzle successful")
+                return puzzle
+            elif self.verbose:
+                print("puzzle unsuccessful")
 
 if __name__ == "__main__":
-    bg = BasicGenerator(5, 2018)
-    rules = bg.generate()
-    for rule in rules:
-        print(structured_to_raw_rule(rule))
+    bg = BasicGenerator(7, seed=2019, verbose=True)
+    puzzle = bg.generate()
+    print(puzzle)

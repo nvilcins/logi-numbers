@@ -11,7 +11,7 @@ class Rule:
         self.update_rule_variables()
 
     def __str__(self):
-        return "Rule: " + self.get_human_readable_rule()
+        return "<Rule: {rule}>" .format(rule=self.get_human_readable_rule())
 
     def __hash__(self):
         """
