@@ -1,5 +1,5 @@
 import string
-from helpers import raw_to_structured_rule
+from rule import Rule
 
 
 class Puzzle:
@@ -9,7 +9,7 @@ class Puzzle:
         self.rules = []
 
     def add_rule(self, rule_str):
-        self.rules.append(raw_to_structured_rule(rule_str))
+        self.rules.append(Rule(rule_raw=rule_str))
 
     def add_rules(self, rules_str):
         for rule_str in rules_str:

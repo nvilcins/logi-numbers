@@ -117,7 +117,14 @@ def structured_to_raw_rule(rule):
     """
     if "value" in rule:
         return str(rule["value"])
-    return "{lhs} {op} {rhs}".format(
+    template = "{lhs} {op} {rhs}"
+    if "value" not in rule["lhs"] and "value" not in rule["rhs"]:
+        template = "({lhs}) {op} ({rhs})"
+    elif "value" not in rule["lhs"]:
+        template = "({lhs}) {op} {rhs}"
+    elif "value" not in rule["rhs"]:
+        template = "{lhs} {op} ({rhs})"
+    return template.format(
         op=rule["op"],
         lhs=structured_to_raw_rule(rule["lhs"]),
         rhs=structured_to_raw_rule(rule["rhs"]),
