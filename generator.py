@@ -7,6 +7,23 @@ from solver_brute import BruteForceSolver
 from solver_logic import LogicBasedSolver
 
 
+def ri(a, b):
+    return random.randint(a, b)
+
+
+def sample(a):
+    return a[ri(0, len(a)-1)]
+
+
+def choice(weights):
+    x = ri(1, sum(weights))
+    s = 0
+    for i, w in enumerate(weights):
+        s += w
+        if s >= x:
+            return i
+
+
 class BasicGenerator:
     def __init__(self, n, seed=None, verbose=False):
         self.n = n
@@ -15,15 +32,75 @@ class BasicGenerator:
         if seed is not None:
             random.seed(seed)
         self.verbose = verbose
+        self.number_range = [1, self.n + 2]
+        # weights for random sampling
+        self.weights = {
+            "var_num": [5, 1],  # choice between variable and numerical value
+            "val_exp": [3, 1],  # choice between value (variable/number) and expression
+            "logic_eq": [1, 10],  # choice between logical expressions (if-then/iff) and equation/inequality
+        }
 
     def get_random_rule(self):
         """
-        generate a random rule
-        currently only a basic template
+        generate random rule according to weight definition
         """
-        var1 = self.variables[random.randint(0, self.n - 1)]
-        var2 = self.variables[random.randint(0, self.n - 1)]
-        op1 = ["+", "-", "*", ][random.randint(0, 2)]
+
+        # get random expression
+        # can specify a subset of allowed operations `ops`
+        def rec_get_expression(ops=None):
+            # decide whether to get a value (variable or number)
+            if choice(self.weights["val_exp"]) == 0:
+                # decide whether to get a variable
+                if choice(self.weights["var_num"]) == 0:
+                    value = sample(self.variables)
+                # get number
+                else:
+                    value = ri(*self.number_range)
+                return {
+                    "value": value
+                }
+            # get deeper expression
+            else:
+                # choose operation
+                op = sample(["+", "-", "*"] if ops is None else ops)
+                # if we have multiplication here, only allow multiplication further to avoid bracketing
+                ops_next = ["*"] if op == "*" else None
+                return {
+                    "op": op,
+                    "lhs": rec_get_expression(ops=ops_next),
+                    "rhs": rec_get_expression(ops=ops_next),
+                }
+
+        # get random relation (>, =, or !=)
+        def get_relation():
+            return {
+                "op": sample([">", "=", "!="]),
+                "lhs": rec_get_expression(),
+                "rhs": rec_get_expression(),
+            }
+
+        # decide whether to use logical operator
+        if choice(self.weights["logic_eq"]) == 0:
+            # generate logical operator with random expressions on both sides
+            rule_structured = {
+                "op": sample(["=>", "<=>"]),
+                "lhs": get_relation(),
+                "rhs": get_relation(),
+            }
+        else:
+            # generate random relation
+            rule_structured = get_relation()
+
+        return Rule(rule_structured=rule_structured)
+
+    def get_random_rule_simple(self):
+        """
+        generate a simple random rule
+        variable (+/-/*) variable (>/</=/!=) number
+        """
+        var1 = self.variables[ri(0, self.n - 1)]
+        var2 = self.variables[ri(0, self.n - 1)]
+        op1 = ["+", "-", "*", ][ri(0, 2)]
         lhs = {
             "op": op1,
             "lhs": {
@@ -33,11 +110,11 @@ class BasicGenerator:
                 "value": var2,
             },
         }
-        val = random.randint(1, 10)
+        val = ri(1, 10)
         rhs = {
             "value": val,
         }
-        op0 = [">", "<", "=", "!=", ][random.randint(0, 3)]
+        op0 = [">", "<", "=", "!=", ][ri(0, 3)]
         if op0 == "<":
             op0 = ">"
             lhs, rhs = rhs, lhs
@@ -116,3 +193,6 @@ if __name__ == "__main__":
     bg = BasicGenerator(7, seed=2019, verbose=True)
     puzzle = bg.generate()
     print(puzzle)
+    # bg = BasicGenerator(7, seed=2019, verbose=True)
+    # for i in range(10):
+    #     print(bg.get_random_rule())
