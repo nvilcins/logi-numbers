@@ -51,11 +51,25 @@ class Rule:
         """
         get the simplified version of the rule as string
         """
+        # replace exponents with multiple multipliers
+        # "A**3" => "A*A*A"
+        def replace_exponents(expr):
+            while "**" in expr:
+                ind = expr.index("**")
+                p, var = "", expr[ind-1]
+                ind2 = ind + 2
+                while ind2 < len(expr) and expr[ind2].isnumeric():
+                    p += expr[ind2]
+                    ind2 += 1
+                expr = expr[:ind-1] + "*".join([var, ] * int(p)) + expr[ind+3:]
+            return expr
+
         # simplify an expression ("A+A-1" => "2A-1")
         def simplify_expression(expression):
             raw_tmp = structured_to_raw_rule(expression)
             raw_simple = str(sympy.expand(raw_tmp.lower())).upper()
-            return raw_simple.replace(" ", "").upper()
+            raw_simple = raw_simple.replace(" ", "").upper()
+            return replace_exponents(raw_simple)
 
         # separate groups by sign to make a normalized relation
         # "-A+2B-CD+4E-5" => "2B+4E", "A+CD+5"
@@ -205,6 +219,7 @@ if __name__ == "__main__":
     import json
     rule_raw = "-2B>C-4"
     rule_raw = "C + D - E = 0"
+    rule_raw = "A*(A+1)*(A-2)=6"
     rule = Rule(rule_raw=rule_raw)
     print(json.dumps(rule.rule, indent=2))
     print(rule)
