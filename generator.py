@@ -7,9 +7,13 @@ from solver_brute import BruteForceSolver
 from solver_logic import LogicBasedSolver
 
 
+# initialize RNG object so that sympy doesn't mess with our seed
+rng = random.Random()
+
+
 # uniformly random number from interval
 def ri(a, b):
-    return random.randint(a, b)
+    return rng.randint(a, b)
 
 
 # uniformly random element from array a
@@ -33,7 +37,7 @@ class BasicGenerator:
         self.variables = string.ascii_uppercase[:self.n]
         self.values = None
         if seed is not None:
-            random.seed(seed)
+            rng.seed(seed)
         self.verbose = verbose
         self.number_range = [1, self.n + 2]
         # weights for random sampling
@@ -48,7 +52,6 @@ class BasicGenerator:
         """
         generate random rule according to weight definition
         """
-
         # get random expression
         # can specify a subset of allowed operations `ops`
         def rec_get_expression(ops=None):
@@ -100,7 +103,8 @@ class BasicGenerator:
             # generate random relation
             rule_structured = get_relation()
 
-        return Rule(rule_structured=rule_structured)
+        r = Rule(rule_structured=rule_structured)
+        return r
 
     def get_random_rule_simple(self):
         """
@@ -153,7 +157,10 @@ class BasicGenerator:
         cnt = self.get_solution_count(puzzle)
         while True:
             # add new random rule
-            puzzle.rules.append(self.get_random_rule())
+            random_rule = self.get_random_rule()
+            if not random_rule.is_ok():
+                continue
+            puzzle.rules.append(random_rule)
             # get the new number of solutions
             cnt_new = self.get_solution_count(puzzle)
             # unique solution - we are done
