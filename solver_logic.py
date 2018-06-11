@@ -222,13 +222,14 @@ def express_variable_from_rule(rule: Rule, variable):
             # go deeper
             return rec(new_expression_reducable, new_expression_result, var)
 
-    new_rule = Rule(rule_structured=copy.deepcopy(rule.rule))
+    new_rule_structured = copy.deepcopy(rule.rule)
     # swap lhs and rhs to guarantee given variable on the left hand side
-    if expression_has_var(new_rule.rule["rhs"], variable):
-        new_rule.rule["lhs"], new_rule.rule["rhs"] = new_rule.rule["rhs"], new_rule.rule["lhs"]
+    if expression_has_var(new_rule_structured["rhs"], variable):
+        new_rule_structured["lhs"], new_rule_structured["rhs"] = new_rule_structured["rhs"], new_rule_structured["lhs"]
     # update rule's lhs and rhs
-    new_rule.rule["lhs"], new_rule.rule["rhs"] = rec(new_rule.rule["lhs"], new_rule.rule["rhs"], variable)
+    new_rule_structured["lhs"], new_rule_structured["rhs"] = rec(new_rule_structured["lhs"], new_rule_structured["rhs"], variable)
     # result
+    new_rule = Rule(rule_structured=new_rule_structured, is_variable_expression=True)
     return new_rule
 
 
@@ -275,6 +276,7 @@ class LogicBasedSolver:
             variable: set()
             for variable in self.puzzle.variables
         }
+        self.variable_expression_hashes = set()
 
     def add_new_rule(self, rule: Rule):
         """
@@ -284,6 +286,19 @@ class LogicBasedSolver:
         if h not in self.rule_hashes:
             self.rules.append(rule)
             self.rule_hashes.add(h)
+            return True
+        return False
+
+    def add_new_variable_expression(self, var, variable_expression: Rule):
+        """
+        add new rule if it is not already present
+        """
+        h = variable_expression.__hash__()
+        if h not in self.variable_expression_hashes:
+            self.variable_expressions[var].add(variable_expression)
+            self.variable_expression_hashes.add(h)
+            return True
+        return False
 
     def solve(self, max_steps=None):
         steps = 0
@@ -298,6 +313,7 @@ class LogicBasedSolver:
             if max_steps is not None and steps == max_steps:
                 if self.verbose:
                     print("fail")
+                    print(self.possible_values)
                 return False, self.possible_values
             self.try_expressing_variables()
             self.try_applying_variable_expressions()
@@ -338,6 +354,7 @@ class LogicBasedSolver:
         """
         go through all rules and try to express each variable
         """
+        new_expressions = []
         for rule in self.rules:
             if rule.rule["op"] != "=":
                 continue
@@ -345,11 +362,13 @@ class LogicBasedSolver:
                 if cnt != 1:
                     continue
                 new_expression = express_variable_from_rule(rule, var)
-                if new_expression is not None:
-                    if self.verbose:
-                        print("new variable expression:", rule, ",", var, "==>", new_expression)
-                    self.variable_expressions[var].add(new_expression)
-
+                if new_expression is not None and new_expression.is_ok():
+                    new_expressions.append((var, new_expression))
+        for var, new_expression in new_expressions:
+            added = self.add_new_variable_expression(var, new_expression)
+            if added and self.verbose:
+                print("new variable expression:", new_expression)
+                
     def try_applying_variable_expressions(self):
         """
         go through all rules and try to apply each variable expression to generate new rules
@@ -360,11 +379,12 @@ class LogicBasedSolver:
             for var in rule.variables:
                 for var_expression in self.variable_expressions[var]:
                     new_rule = apply_variable_expression(rule, var_expression)
-                    if self.verbose:
-                        print("new rule:", rule, ",", var_expression, "==>", new_rule)
-                    new_rules.append(new_rule)
+                    if new_rule.is_ok():
+                        new_rules.append(new_rule)
         for new_rule in new_rules:
-            self.add_new_rule(new_rule)
+            added = self.add_new_rule(new_rule)
+            if added and self.verbose:
+                print("new rule:", new_rule)
 
 
 if __name__ == "__main__":
@@ -390,4 +410,4 @@ if __name__ == "__main__":
     #     "D + A = C",
     # ])
     lbs = LogicBasedSolver(puzzle, verbose=True)
-    lbs.solve(4)
+    lbs.solve(5)
