@@ -23,7 +23,7 @@ def raw_to_structured_rule(rule_str):
     # remove spaces and capitalize
     rule_str = rule_str.replace(" ", "").upper()
 
-    val, op, lhs_str, rhs_str = None, None, None, None
+    val, op, lhs_str, rhs_str, full_str = None, None, None, None, None
 
     # if-then / if and only if rules
     if "<=>" in rule_str:
@@ -53,13 +53,6 @@ def raw_to_structured_rule(rule_str):
         op = ">"
         rhs_str, lhs_str = rule_str.split("<")
 
-    # +/- operation
-    elif "+" in rule_str or "-" in rule_str:
-        # index of last +/- operator
-        ind = len(rule_str) - 1 - [x in ["+", "-"] for x in rule_str][::-1].index(True)
-        op = rule_str[ind]
-        lhs_str, rhs_str = rule_str[:ind], rule_str[ind+1:]
-
     # value (number or a single variable)
     elif rule_str.isnumeric():
         val = int(rule_str)
@@ -67,7 +60,7 @@ def raw_to_structured_rule(rule_str):
         val = rule_str
 
     # implicit multiplication
-    else:
+    elif rule_str.isalnum():
         # first value is variable
         if rule_str[0].isalpha():
             op = "*"
@@ -78,7 +71,72 @@ def raw_to_structured_rule(rule_str):
             op = "*"
             lhs_str, rhs_str = rule_str[:first_letter], rule_str[first_letter:]
 
+    # parse complex expression (containing brackets and/or explicit operations)
+    else:
+        # split expression into sub-expressions, that are connected with +/-/*//
+        sub_expressions, ops, op_inds = [], [], []
+        # is first sub-expression with minus sign
+        neg = rule_str[0] == "-"
+        ind = 1 if neg else 0
+        while ind < len(rule_str):
+            # handle sub-expression in brackets (e.g., "(A+B)")
+            if rule_str[ind] == "(":
+                sub_expression = ""
+                x = 0
+                for ch in rule_str[ind:]:
+                    sub_expression += ch
+                    if ch == ")":
+                        x += 1
+                    if ch == "(":
+                        x -= 1
+                    ind += 1
+                    if x == 0:
+                        break
+                sub_expressions.append(sub_expression[1:-1])
+            # handle alphanumeric block (e.g., "12AC")
+            elif rule_str[ind].isalnum():
+                sub_expression = ""
+                while ind < len(rule_str) and rule_str[ind].isalnum():
+                    sub_expression += rule_str[ind]
+                    ind += 1
+                sub_expressions.append(sub_expression)
+            # if none of the above, get the operation
+            elif rule_str[ind] in ["+", "-", "*", "/"]:
+                ops.append(rule_str[ind])
+                op_inds.append(ind)
+                ind += 1
+
+        # single sub-expression - recurse on it
+        if len(sub_expressions) == 1:
+            full_str = sub_expressions[0]
+        # otherwise find the right-most, least-priority operator and split the expression there
+        else:
+            ind = None
+            # first handle +/-
+            if "+" in ops or "-" in ops:
+                ind = len(ops) - 1 - [op in ["+", "-"] for op in ops][::-1].index(True)
+            # if no +/-, get *//
+            elif "*" in ops or "/" in ops:
+                ind = len(ops) - 1 - [op in ["*", "/"] for op in ops][::-1].index(True)
+            # get the op and split rule string at the op
+            op = ops[ind]
+            lhs_str = rule_str[:op_inds[ind]]
+            rhs_str = rule_str[op_inds[ind]+1:]
+
+        if neg:
+            # "-X" => "0-X"
+            if full_str is not None:
+                op = "-"
+                lhs_str = "0"
+                rhs_str = full_str
+                full_str = None
+            # "-X+..." => "0-X+..."
+            elif lhs_str is not None:
+                lhs_str = "0" + lhs_str
+
     # format result
+    if full_str is not None:
+        return raw_to_structured_rule(full_str)
     if val is not None:
         return {
             "value": val,
@@ -153,3 +211,8 @@ if __name__ == "__main__":
       },
     }
     print(rule_raw)
+    rule_raw = "A+(BC-D)+D*E/F=F/G"
+    rule_raw = "(F*((A+B)-(D+E)))/H=2"
+    rule_raw = "-A+D=2"
+    rule_structured = raw_to_structured_rule(rule_raw)
+    print(json.dumps(rule_structured, indent=2))
