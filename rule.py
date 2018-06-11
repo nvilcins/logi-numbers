@@ -33,7 +33,7 @@ class Rule:
         """
         # check characteristics of overly complex expression
         simplified = self.get_simplified_str()
-        if any(bad in simplified for bad in ["**", "EXP", "ZOO"]):
+        if any(bad in simplified for bad in ["**", "EXP", "ZOO", "/"]):
             return False
         # for logical operator rules check if both sides are ok
         if self.rule["op"] in ["=>", "<=>"]:
@@ -55,9 +55,35 @@ class Rule:
         def simplify_expression(expression):
             raw_tmp = structured_to_raw_rule(expression)
             raw_simple = str(sympy.expand(raw_tmp.lower())).upper()
-            if raw_simple[:1] == "-":
-                raw_simple = "0" + raw_simple
             return raw_simple.replace(" ", "").upper()
+
+        # separate groups by sign to make a normalized relation
+        # "-A+2B-CD+4E-5" => "2B+4E", "A+CD+5"
+        def order_groups(expression_simplified):
+            signs, groups, sign, group = [], [], "+", ""
+            for ch in expression_simplified:
+                if ch in ["-", "+"]:
+                    if group:
+                        groups.append(group)
+                        signs.append(sign)
+                        group = ""
+                    sign = ch
+                else:
+                    group += ch
+            else:
+                signs.append(sign)
+                groups.append(group)
+            lhs, rhs = "", ""
+            for sign, group in zip(signs, groups):
+                if sign == "+":
+                    if lhs:
+                        lhs += "+"
+                    lhs += group
+                else:
+                    if rhs:
+                        rhs += "+"
+                    rhs += group
+            return lhs if lhs else "0", rhs if rhs else "0"
 
         # simplify a relation ("A+A-1>2" => "2A-3>0")
         def simplify_relation(relation):
@@ -66,7 +92,8 @@ class Rule:
                 "lhs": relation["lhs"],
                 "rhs": relation["rhs"],
             })
-            return raw_simple + relation["op"] + "0"
+            lhs, rhs = order_groups(raw_simple)
+            return lhs + relation["op"] + rhs
 
         # maintain lhs for variable expressions
         if self.is_variable_expression:
@@ -172,3 +199,12 @@ class Rule:
 
         # fail
         raise Exception("Failed to eval!", self.rule, values)
+
+
+if __name__ == "__main__":
+    import json
+    rule_raw = "-2B>C-4"
+    rule_raw = "C + D - E = 0"
+    rule = Rule(rule_raw=rule_raw)
+    print(json.dumps(rule.rule, indent=2))
+    print(rule)
