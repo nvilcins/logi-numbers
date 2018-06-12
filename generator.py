@@ -7,6 +7,30 @@ from solver_brute import BruteForceSolver
 from solver_logic import LogicBasedSolver
 
 
+WEIGHT_PRESETS = {
+    "easy": {
+        "var_num": [5, 1],  # choice between variable and numerical value
+        "val_exp": [3, 1],  # choice between value (variable/number) and expression
+        "add_mul": [3, 1],  # choice between addition (or subtraction) and multiplication
+        "eq_ineq": [1, 0],  # choice between equalities (=) and inequalities (!=, >, <)
+        "logic_eq": [0, 1],  # choice between logical expressions (if-then/iff) and equation/inequality
+    },
+    "medium": {
+        "var_num": [5, 1],
+        "val_exp": [4, 2],
+        "add_mul": [4, 2],
+        "eq_ineq": [3, 1],
+        "logic_eq": [0, 1],
+    },
+    "hard": {
+        "var_num": [5, 1],
+        "val_exp": [4, 2],
+        "add_mul": [4, 2],
+        "eq_ineq": [3, 1],
+        "logic_eq": [2, 10],
+    },
+}
+
 # initialize RNG object so that sympy doesn't mess with our seed
 rng = random.Random()
 
@@ -41,12 +65,7 @@ class BasicGenerator:
         self.verbose = verbose
         self.number_range = [1, self.n + 2]
         # weights for random sampling
-        self.weights = {
-            "var_num": [5, 1],  # choice between variable and numerical value
-            "val_exp": [3, 1],  # choice between value (variable/number) and expression
-            "eq_ineq": [3, 1],  # choice between equalities (= or !=) and inequalities (> or <)
-            "logic_eq": [1, 10],  # choice between logical expressions (if-then/iff) and equation/inequality
-        } if custom_weights is None else custom_weights
+        self.weights = WEIGHT_PRESETS["easy"] if custom_weights is None else custom_weights
 
     def get_random_rule(self):
         """
@@ -69,7 +88,12 @@ class BasicGenerator:
             # get deeper expression
             else:
                 # choose operation
-                op = sample(["+", "-", "*"] if ops is None else ops)
+                if ops is not None:
+                    op = sample(ops)
+                elif choice(self.weights["add_mul"]) == 0:
+                    op = sample(["+", "-"] if ops is None else ops)
+                else:
+                    op = "*"
                 # if we have multiplication here, only allow multiplication further to avoid bracketing
                 ops_next = ["*"] if op == "*" else None
                 return {
@@ -82,9 +106,9 @@ class BasicGenerator:
         def get_relation():
             # choose between equalities and inequalities
             if choice(self.weights["eq_ineq"]) == 0:
-                op = sample(["=", "!="])
+                op = "="
             else:
-                op = sample([">", ">="])
+                op = sample([">", ">=", "!="])
             return {
                 "op": op,
                 "lhs": rec_get_expression(),
@@ -143,7 +167,7 @@ class BasicGenerator:
         """
         # first do 3 steps of logical solver, to (hopefully) greatly reduce search space
         lbs = LogicBasedSolver(puzzle)
-        _, possible_values = lbs.solve(max_steps=3)
+        _, possible_values = lbs.solve(max_steps=2)
         # then apply brute force to check all possible assignments (after logical reductions)
         bfs = BruteForceSolver(puzzle)
         cnt, _ = bfs.solve(possible_values=possible_values)
@@ -220,13 +244,10 @@ class BasicGenerator:
                 print("puzzle unsuccessful")
 
 if __name__ == "__main__":
-    bg = BasicGenerator(8, seed=2019, verbose=True)
-    puzzle = bg.generate()
-    print(puzzle)
     # bg = BasicGenerator(7, seed=2019, verbose=True)
-    # for i in range(10):
-    #     print(bg.get_random_rule())
-    # bg = BasicGenerator(6, seed=2019, verbose=True)
-    # for i in range(10):
-    #     puzzle = bg.generate()
-    #     print(puzzle)
+    # puzzle = bg.generate()
+    # print(puzzle)
+    bg = BasicGenerator(8, seed=2019, verbose=True, custom_weights=WEIGHT_PRESETS["easy"])
+    for i in range(10):
+        puzzle = bg.generate()
+        print(puzzle)
