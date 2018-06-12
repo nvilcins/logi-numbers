@@ -40,10 +40,12 @@ class Rule:
             rule_lhs = Rule(rule_structured=self.rule["lhs"])
             rule_rhs = Rule(rule_structured=self.rule["rhs"])
             return rule_lhs.is_ok() and rule_rhs.is_ok()
-        else:
-            # check if rule contains any variable
-            if not self.variables:
-                return False
+        # check if rule contains any variable
+        if not self.variables:
+            return False
+        # expression to long:
+        if len(simplified) > 1000:
+            return False
         # is ok if didn't fail
         return True
 
