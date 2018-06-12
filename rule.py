@@ -61,6 +61,9 @@ class Rule:
                 while ind2 < len(expr) and expr[ind2].isnumeric():
                     p += expr[ind2]
                     ind2 += 1
+                # case "A**(-2)" or similar - too complex and we will skip it later anyway, so disregard the expression
+                if not p:
+                    return expr
                 expr = expr[:ind-1] + "*".join([var, ] * int(p)) + expr[ind+3:]
             return expr
 

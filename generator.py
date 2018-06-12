@@ -158,7 +158,8 @@ class BasicGenerator:
         while True:
             # add new random rule
             random_rule = self.get_random_rule()
-            if not random_rule.is_ok():
+            # skip rule if not ok or if it is in form "A=1"
+            if not random_rule.is_ok() or (len(random_rule.variables) == 1 and random_rule.rule["op"] == "="):
                 continue
             puzzle.rules.append(random_rule)
             # get the new number of solutions
@@ -225,3 +226,7 @@ if __name__ == "__main__":
     # bg = BasicGenerator(7, seed=2019, verbose=True)
     # for i in range(10):
     #     print(bg.get_random_rule())
+    # bg = BasicGenerator(6, seed=2019, verbose=True)
+    # for i in range(10):
+    #     puzzle = bg.generate()
+    #     print(puzzle)
