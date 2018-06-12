@@ -247,7 +247,7 @@ if __name__ == "__main__":
     # bg = BasicGenerator(7, seed=2019, verbose=True)
     # puzzle = bg.generate()
     # print(puzzle)
-    bg = BasicGenerator(8, seed=2019, verbose=True, custom_weights=WEIGHT_PRESETS["easy"])
+    bg = BasicGenerator(6, seed=2019, verbose=True, custom_weights=WEIGHT_PRESETS["easy"])
     for i in range(10):
         puzzle = bg.generate()
         print(puzzle)
